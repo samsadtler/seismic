@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
+// var mongoose = require('mongoose');
 
 // our db model
-var Animal = require("../models/model.js");
+// var Animal = require("../models/model.js");
 
 /**
  * GET '/'

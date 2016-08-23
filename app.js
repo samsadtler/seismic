@@ -4,10 +4,26 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+// var mongoose = require('mongoose');
 var env = require('node-env-file');
 
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
+
+// server.listen(80);
+
+app.get('/', function (req, res) {
+   // res.send('hello world');
+  res.sendFile( __dirname+'/public/index.html');
+});
+
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
 
 // if in development mode, load .env variables
 if (app.get("env") === "development") {
@@ -15,7 +31,7 @@ if (app.get("env") === "development") {
 }
 
 // connect to database
-app.db = mongoose.connect(process.env.MONGOLAB_URI);
+// app.db = mongoose.connect(process.env.MONGOLAB_URI);
 
 // view engine setup - this app uses Hogan-Express
 // https://github.com/vol4ok/hogan-express
@@ -44,7 +60,6 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
