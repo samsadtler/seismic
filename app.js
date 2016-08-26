@@ -3,7 +3,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fetch = require('node-fetch');
 fetch.Promise = require('promise');
-
+var FormData = require('form-data');
+	
 
 app.get('/', function(req, res){
   res.sendfile('index.html');
@@ -43,26 +44,48 @@ var lastTime = 0,
     magnitude,
     place;
 
-var refreshTime = 5;
+var refreshTime = 1;
 var quakeTimer;
 
 function again(times){
 	console.log('maybe this is a good time to send a signal to the particle')
-  if(times > 0) {
-    ui.Vibe.vibrate('short');
-    setTimeout(function(){
-      again(times - 1);
-    }, 1500);
-  }
+  
 };
 
+function render() {
+	console.log('render');
+  if(refreshTime == 1) {
+   clearTimeout(quakeTimer);
+   console.log('clearTimer')
+   getQuakes();
+   
+  };
+};
+function vibrateSense(magnitude, location){
+
+	console.log('in vibrateSense')
+	// this data is send to the Particle Electron
+	// Code is stopping here
+	var form = new FormData();
+	form.append('args','on');
+	// form.append('value','off');
+	console.log('form --> ' + JSON.stringify(form))
+
+	fetch('https://api.particle.io/v1/devices/260044001951353338363036/led?access_token=28a267c1cb56bdbe8524907441b5b1ff0c92d2ca', { method: 'POST', body: form})
+	    .then(function(res) {
+	        return res.json();
+	    }).then(function(json) {
+	        console.log(json);
+	    });
+
+};
 function getQuakes() {
 fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
+
         return res.json();
     }).then(function(data) {
 
-        console.log("Got new quake information.");
       for(var i = 0; i < data.features.length; i++){
         var properties = data.features[i].properties;
         var time = properties.time;
@@ -73,28 +96,21 @@ fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson
          console.log('time: ',newTime," magnitude: ", magnitude, " place: ", place);
         }
       }
-      console.log(newTime, lastTime);
+      // console.log(newTime, lastTime);
       if(newTime > lastTime) {
         lastTime = newTime;
         console.log('There is a new quake! Its magnitude is ' + magnitude.toString());
-        vibrateTimes(Math.round(magnitude));
-        main.body = magnitude.toString();
-        render();
+       	vibrateSense(magnitude, place);
+        // render();
       }
-      quakeTimer = setTimeout(function(){
+    quakeTimer = setTimeout(function(){
+      	// console.log('call getQuakes again');
         getQuakes();
-      }, refreshTime * 60000);
+      }, refreshTime * 1000);
     })
 }
 
-function render() {
-  if(refreshTime == 1) {
-   clearTimeout(quakeTimer);
-   console.log('clearTimer')
-   getQuakes();
-   render();
-  };
-};
+
 
 
 setTimeout(function(){

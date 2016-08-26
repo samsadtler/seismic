@@ -6,6 +6,7 @@
     "body-parser": "~1.13.2",
     "debug": "~2.2.0",
     "express": "~4.10.2",
+    "form-data": "^1.0.0-rc4",
     "node-env-file": "^0.1.7",
     "node-fetch": "^1.6.0",
     "promise": "^7.1.1",
