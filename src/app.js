@@ -18,7 +18,7 @@ function vibrateSense(magnitude, location){
 	// form.append('value','off');
 	console.log('form --> ' + JSON.stringify(form))
 
-	fetch('https://api.particle.io/v1/devices/260044001951353338363036/led?access_token=28a267c1cb56bdbe8524907441b5b1ff0c92d2ca', { method: 'POST', body: form})
+	fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/led?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
     .then(function(res) {
         return res.json();
     })
@@ -63,8 +63,7 @@ function getMostRecentQuake(data) {
 
 function getScaledDistanceToQuake(quakeAddress, deviceAddress) {
   quakeAddress = quakeAddress.split(' ').join('+');
-  var key = 'AIzaSyDnDoXBvi4ZfrxWSCYww2NMT2u7qey5-EY';
-  fetch('https://maps.googleapis.com/maps/api/geocode/json?origins='+quakeAddress+'&destinations='+deviceAddress+'&key='+key)
+  fetch('https://maps.googleapis.com/maps/api/geocode/json?origins='+quakeAddress+'&destinations='+deviceAddress+'&key='+process.env.GOOGLE_MAPS_API_KEY)
   .then(function(res) {
     return res.json();
   })
