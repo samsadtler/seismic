@@ -1,48 +1,7 @@
-// var app = require('express')();
-// var http = require('http').Server(app);
-// var io = require('socket.io')(http);
-// var fetch = require('node-fetch');
-// fetch.Promise = require('promise');
-// var FormData = require('form-data');
-//
-//
-// app.get('/', function(req, res){
-//   res.sendfile('index.html');
-// });
-//
-// io.on('connection', function(socket){
-//   console.log('a user connected');
-// });
-//
-// http.listen(3000, function(){
-//   console.log('listening on *:3000');
-// });
-//
-// io.on('connection', function(socket){
-//   console.log('a user connected');
-//   socket.on('disconnect', function(){
-//     console.log('user disconnected');
-//   });
-// });
-//
-// io.on('connection', function(socket){
-//   socket.on('chat message', function(msg){
-//     console.log('message: ' + msg);
-//   });
-// });
-//
-// io.emit('some event', { for: 'everyone' });
-//
-// io.on('connection', function(socket){
-//   socket.on('chat message', function(msg){
-//     io.emit('chat message', msg);
-//   });
-// });
-//////////////////// USGS API Call ////////////////////////
 var lastTime = 0;
 var quakeTimer;
 
-function render() {
+function start() {
 	console.log('render');
   clearTimeout(quakeTimer);
   console.log('clearTimer')
@@ -79,7 +38,9 @@ function getQuakes() {
       if(mostRecentQuake.time > lastTime && mostRecentQuake.magnitude > 1) {
         lastTime = mostRecentQuake.time;
         console.log('There is a new quake! Its magnitude is ' + mostRecentQuake.magnitude.toString());
-        vibrateSense(scaleMagnitudeToMilliseconds(mostRecentQuake.magnitude), mostRecentQuake.place);
+        var scaledMagnitude = scaleMagnitude(mostRecentQuake.magnitude);
+        var scaledDistanceToQuake = getScaledDistanceToQuake(mostRecentQuake.place, 'New+York,New+York');
+        vibrateSense(scaledMagnitude, scaledDistanceToQuake);
         render();
       }
 
@@ -100,7 +61,27 @@ function getMostRecentQuake(data) {
   }
 }
 
-function scaleMagnitudeToMilliseconds(magnitude) {
+function getScaledDistanceToQuake(quakeAddress, deviceAddress) {
+  quakeAddress = quakeAddress.split(' ').join('+');
+  var key = 'AIzaSyDnDoXBvi4ZfrxWSCYww2NMT2u7qey5-EY';
+  fetch('https://maps.googleapis.com/maps/api/geocode/json?origins='+quakeAddress+'&destinations='+deviceAddress+'&key='+key)
+  .then(function(res) {
+    return res.json();
+  })
+  .then(function(data) {
+    scaleDistance(data.rows[0].elements[0].distance.value);
+  })
+}
+
+function scaleDistance(distance) {
+  var distanceMax = 20038000;
+  var scaleMax = 255;
+
+  var scaledDistance = (scaleMax/distanceMax) * (distance - distanceMax) + scaleMax;
+  return Math.abs(Math.round(scaledDistance));
+}
+
+function scaleMagnitude(magnitude) {
   var richterMax = 12;
   var richterMin = 1;
   var milliMax = 3000;
