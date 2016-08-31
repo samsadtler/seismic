@@ -76,10 +76,10 @@ function getQuakes() {
 		.then(function(data) {
       var mostRecentQuake = getMostRecentQuake(data)
 
-      if(mostRecentQuake.time > lastTime) {
+      if(mostRecentQuake.time > lastTime && mostRecentQuake.magnitude > 1) {
         lastTime = mostRecentQuake.time;
         console.log('There is a new quake! Its magnitude is ' + mostRecentQuake.magnitude.toString());
-        vibrateSense(mostRecentQuake.magnitude, mostRecentQuake.place);
+        vibrateSense(scaleMagnitudeToMilliseconds(mostRecentQuake.magnitude), mostRecentQuake.place);
         render();
       }
 
@@ -98,4 +98,14 @@ function getMostRecentQuake(data) {
   } else {
     return {}
   }
+}
+
+function scaleMagnitudeToMilliseconds(magnitude) {
+  var richterMax = 12;
+  var richterMin = 1;
+  var milliMax = 3000;
+  var milliMin = 500;
+
+  var scaledMagnitude = ((milliMax - milliMin)/(richterMax - richterMin)) * (magnitude - richterMax) + milliMax;
+  return Math.abs(Math.round(scaledMagnitude));
 }
