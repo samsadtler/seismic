@@ -1,64 +1,67 @@
 var quakeTimer;
+var lastRecordedQuakeTime = 0;
 
 function start() {
-  checkForQuakes(0);
+  checkForQuakes();
 }
 
 function stop() {
   clearTimeout(quakeTimer);
 }
 
-function checkForQuakes(lastTime) {
-  var mostRecentQuake = getMostRecentQuake();
+function checkForQuakes() {
+  loadMostRecentQuake()
+  .then(loadDistanceToQuake)
+  .then(triggerSense);
 
-  if(mostRecentQuake.time > lastTime && mostRecentQuake.mag > 1) {
-    lastTime = mostRecentQuake.time;
-    var scaledMagnitude = scaleMagnitude(mostRecentQuake.mag);
-    var scaledDistanceToQuake = scaleDistance(getDistanceToQuake(mostRecentQuake.place, 'New+York,New+York'));
-    vibrateSense(scaledMagnitude, scaledDistanceToQuake);
-  }
-
-  quakeTimer = setTimeout(function(){ checkForQuakes(lastTime); }, 1000);
+  quakeTimer = setTimeout(function(){ checkForQuakes(); }, 1000);
 }
 
-function vibrateSense(magnitude, location){
-
-	console.log('in vibrateSense')
-	// this data is sent to the Particle Electron
-	// Code is stopping here
-	var form = new FormData();
-	form.append('args','on');
-	// form.append('value','off');
-	console.log('form --> ' + JSON.stringify(form))
-
-	fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/led?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
-    .then(function(res) {
-        return res.json();
-    })
-		.then(function(json) {
-        console.log(json);
-    });
-}
-
-function getMostRecentQuake() {
-	fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
+function loadMostRecentQuake() {
+	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
 		})
 		.then(function(data) {
       return data.features[0].properties;
-    });
+    })
 }
 
-function getDistanceToQuake(quakeAddress, deviceAddress) {
-  quakeAddress = quakeAddress.split(' ').join('+');
-  fetch('https://maps.googleapis.com/maps/api/geocode/json?origins='+quakeAddress+'&destinations='+deviceAddress+'&key='+process.env.GOOGLE_MAPS_API_KEY)
+function loadDistanceToQuake(mostRecentQuake) {
+  quakeLocation = mostRecentQuake.place.split(' ').join('+');
+
+  return fetch('https://maps.googleapis.com/maps/api/distancematrix/json?origins='+quakeLocation+'&destinations=New+York,New+York&key='+process.env.GOOGLE_MAPS_API_KEY)
   .then(function(res) {
     return res.json();
   })
   .then(function(data) {
-    return data.rows[0].elements[0].distance.value;
+    mostRecentQuake.distance = data.rows[0].elements[0].distance.value;
+    return mostRecentQuake;
   })
+}
+
+function triggerSense(mostRecentQuake){
+  if(mostRecentQuake.time > lastRecordedQuakeTime && mostRecentQuake.mag > 1) {
+    lastRecordedQuakeTime = mostRecentQuake.time;
+    var scaledMagnitude = scaleMagnitude(mostRecentQuake.mag);
+    var scaledDistanceToQuake = scaleDistance(mostRecentQuake.distance);
+    console.log("SCALED MAGNITUDE: " + scaledMagnitude);
+    console.log("SCALED DISTANCE: " + scaledDistanceToQuake);
+    vibrateSense(scaledMagnitude, scaledDistanceToQuake);
+  }
+}
+
+function vibrateSense(magnitude, distance) {
+  var form = new FormData();
+  form.append('args','on');
+
+  fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/led?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
+    .then(function(res) {
+        return res.json();
+    })
+    .then(function(json) {
+        console.log(json);
+  });
 }
 
 function scaleDistance(distance) {
