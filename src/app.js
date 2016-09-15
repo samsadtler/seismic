@@ -1,5 +1,7 @@
 var dotenv = require('dotenv');
 dotenv.load();
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
 
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
