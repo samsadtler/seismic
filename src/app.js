@@ -84,3 +84,6 @@ function scaleMagnitude(magnitude) {
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
 }
+
+start();
+stop();
