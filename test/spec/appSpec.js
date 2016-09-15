@@ -26,6 +26,12 @@ describe("App.js", function() {
     it("scales 20038000 to 255", function() {
       expect(scaleDistance(20038000)).toEqual(255);
     });
+
+    it("run code", function() {
+      start();
+      stop();
+    });
+    
   });
 
 })

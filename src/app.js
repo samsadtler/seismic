@@ -1,3 +1,6 @@
+var dotenv = require('dotenv');
+dotenv.load();
+
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
 
