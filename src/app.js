@@ -2,6 +2,7 @@ var dotenv = require('dotenv');
 dotenv.load();
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+var FormData = require('form-data');
 
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
@@ -23,7 +24,7 @@ function checkForQuakes() {
 }
 
 function loadMostRecentQuake() {
-  console.log('load')
+  console.log('load');
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
@@ -92,4 +93,3 @@ function scaleMagnitude(magnitude) {
 }
 
 start();
-stop();
