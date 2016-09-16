@@ -57,12 +57,15 @@ function triggerSense(mostRecentQuake){
 }
 
 function vibrateSense(magnitude, distance) {
+  console.log('sending data')
   var concatValues = magnitude+'n'+distance;
+  console.log('concatValues: ', concatValues);
   var form = new FormData();
   form.append('args',concatValues);
 
-  fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/led?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
+  fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/data?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
     .then(function(res) {
+        // console.log(res);
         return res.json();
     })
     .then(function(json) {
