@@ -23,6 +23,7 @@ function checkForQuakes() {
 }
 
 function loadMostRecentQuake() {
+  console.log('load')
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
@@ -65,7 +66,6 @@ function vibrateSense(magnitude, distance) {
 
   fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/data?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
     .then(function(res) {
-        // console.log(res);
         return res.json();
     })
     .then(function(json) {
