@@ -1,7 +1,20 @@
 var dotenv = require('dotenv');
-dotenv.load();
+// dotenv.config({path: '.env'});
+// dotenv.connect({
+//   host: process.env.LOCALHOST
+// });
+var express = require('express');
+var app = express();
+
+// configuration of port, templates (/views), static files (/public)
+// and other expressjs settings for the web server.
+
+// server port number
+app.set('port', process.env.PORT || 5000);
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+
+dotenv.load();
 var FormData = require('form-data');
 
 var quakeTimer;
