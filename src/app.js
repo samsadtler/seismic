@@ -85,8 +85,8 @@ function scaleDistance(distance) {
 function scaleMagnitude(magnitude) {
   var richterMax = 12;
   var richterMin = 1;
-  var newMax = 3000;
-  var newMin = 500;
+  var newMax = 65535;
+  var newMin = 1;
 
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
