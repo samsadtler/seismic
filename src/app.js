@@ -65,6 +65,8 @@ function triggerSense(mostRecentQuake){
     lastRecordedQuakeTime = mostRecentQuake.time;
     var scaledMagnitude = scaleMagnitude(mostRecentQuake.mag);
     var scaledDistanceToQuake = scaleDistance(mostRecentQuake.distance);
+    console.log("MAGNITUDE: " + mostRecentQuake.mag)
+    console.log(" DISTANCE: " + mostRecentQuake.distance/1000);
     console.log("SCALED MAGNITUDE: " + scaledMagnitude);
     console.log("SCALED DISTANCE: " + scaledDistanceToQuake);
     vibrateSense(scaledMagnitude, scaledDistanceToQuake);
@@ -96,10 +98,15 @@ function scaleDistance(distance) {
 }
 
 function scaleMagnitude(magnitude) {
-  var richterMax = 12;
+  var richterMax = 10;
   var richterMin = 1;
   var newMax = 65535;
   var newMin = 1;
+  function map( x,  in_min,  in_max,  out_min,  out_max){
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
 
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
