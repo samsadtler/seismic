@@ -15,6 +15,7 @@ console.log("Port is " + process.env.PORT);
 app.listen(port, function() {
   console.log('Server running on ' + port);
 });
+/*
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
@@ -117,3 +118,4 @@ function scaleMagnitude(magnitude) {
 }
 
 start();
+*/
