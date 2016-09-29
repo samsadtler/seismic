@@ -10,7 +10,7 @@ var port =  process.env.PORT || 5000;
 // and other expressjs settings for the web server.
 
 // server port number
-console.log("Port is " + process.env.PORT);
+// console.log("Port is " + process.env.PORT);
 // app.listen(port);
 app.listen(port, function() {
   console.log('Server running on ' + port);
