@@ -10,7 +10,7 @@ var app = express();
 // and other expressjs settings for the web server.
 
 // server port number
-app.set('port', process.env.PORT || 5000);
+app.listen('port', process.env.PORT || 5000);
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
