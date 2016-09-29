@@ -1,29 +1,19 @@
 var dotenv = require('dotenv');
-// dotenv.config({path: '.env'});
-// dotenv.connect({
-//   host: process.env.LOCALHOST
-// });
 var express = require('express');
-var app = express();
-var port =  process.env.PORT || 5000;
-// configuration of port, templates (/views), static files (/public)
-// and other expressjs settings for the web server.
-
-// server port number
-// console.log("Port is " + process.env.PORT);
-// app.listen(port);
-app.listen(port, function() {
-  console.log('Server running on ' + port);
-});
-
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
-
-dotenv.load();
 var FormData = require('form-data');
 
+var app = express();
+var port =  process.env.PORT || 5000;
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
+
+app.listen(port, function() {
+  console.log('Server running on ' + port);
+  dotenv.load();
+  start();
+});
 
 function start() {
   checkForQuakes();
@@ -116,5 +106,3 @@ function scaleMagnitude(magnitude) {
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
 }
-
-start();
