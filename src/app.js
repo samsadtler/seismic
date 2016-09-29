@@ -5,13 +5,16 @@ var dotenv = require('dotenv');
 // });
 var express = require('express');
 var app = express();
-
+var port =  process.env.PORT || 5000;
 // configuration of port, templates (/views), static files (/public)
 // and other expressjs settings for the web server.
 
 // server port number
 console.log("Port is " + process.env.PORT);
-app.listen('port', process.env.PORT || 5000);
+// app.listen(port);
+app.listen(port, function() {
+  console.log('Server running on ' + port);
+});
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
