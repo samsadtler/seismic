@@ -32,7 +32,7 @@ function checkForQuakes() {
 }
 
 function loadMostRecentQuake() {
-  console.log('load');
+  console.log('Load USGS Data');
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
@@ -98,7 +98,7 @@ function scaleMagnitude(magnitude) {
   var richterMax = 10;
   var richterMin = 1;
   var newMax = 4000;
-  var newMin = 500;
+  var newMin = 200;
 
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
