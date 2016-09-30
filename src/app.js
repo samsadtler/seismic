@@ -87,8 +87,8 @@ function vibrateSense(magnitude, distance) {
 function scaleDistance(distance) {
   var distanceMax = 20038000;
   var distanceMin = 0;
-  var newMax = 255;
-  var newMin =135;
+  var newMax = 135;
+  var newMin = 0;
   var scaledDistance = (distance - distanceMin) * (newMax - newMin) / (distanceMax - distanceMin) + newMin;  
   // var scaledDistance = (newMax/distanceMax) * (distance - distanceMax) + newMax;
   return Math.abs(Math.round(scaledDistance));
