@@ -86,22 +86,19 @@ function vibrateSense(magnitude, distance) {
 
 function scaleDistance(distance) {
   var distanceMax = 20038000;
+  var distanceMin = 0;
   var newMax = 255;
-
-  var scaledDistance = (newMax/distanceMax) * (distance - distanceMax) + newMax;
+  var newMin =135;
+  var scaledDistance = (distance - distanceMin) * (newMax - newMin) / (distanceMax - distanceMin) + newMin;  
+  // var scaledDistance = (newMax/distanceMax) * (distance - distanceMax) + newMax;
   return Math.abs(Math.round(scaledDistance));
 }
 
 function scaleMagnitude(magnitude) {
   var richterMax = 10;
   var richterMin = 1;
-  var newMax = 65535;
-  var newMin = 1;
-  function map( x,  in_min,  in_max,  out_min,  out_max){
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-
+  var newMax = 4000;
+  var newMin = 500;
 
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
