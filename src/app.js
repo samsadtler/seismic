@@ -2,7 +2,7 @@ var dotenv = require('dotenv');
 var express = require('express');
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
-var FormData = require('form-data');
+var formData = require('form-data');
 
 var app = express();
 var port =  process.env.PORT || 5000;
@@ -16,6 +16,7 @@ app.listen(port, function() {
 });
 
 function start() {
+  console.log('start monitoring')
   checkForQuakes();
 }
 
@@ -32,7 +33,7 @@ function checkForQuakes() {
 }
 
 function loadMostRecentQuake() {
-  console.log('Load USGS Data');
+  // console.log('Load USGS Data');
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
@@ -72,7 +73,7 @@ function vibrateSense(magnitude, distance) {
   console.log('sending data')
   var concatValues = magnitude+'n'+distance;
   console.log('concatValues: ', concatValues);
-  var form = new FormData();
+  var form = new formData();
   form.append('args',concatValues);
 
   fetch('https://api.particle.io/v1/devices/'+process.env.DEVICE_KEY+'/data?access_token='+process.env.PARTICLE_TOKEN, { method: 'POST', body: form})
