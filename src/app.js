@@ -3,7 +3,7 @@ var express = require('express');
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 var formData = require('form-data');
-var http = require("http");
+var http = require('http');
 
 var app = express();
 var port =  process.env.PORT || 5000;
@@ -38,7 +38,7 @@ function checkForQuakes() {
 }
 
 function loadMostRecentQuake() {
-  // console.log('Load USGS Data');
+  console.log('Load USGS Data');
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
