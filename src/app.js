@@ -38,7 +38,7 @@ function checkForQuakes() {
 }
 
 function loadMostRecentQuake() {
-  console.log('Load USGS Data');
+  // console.log('Load USGS Data');
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
