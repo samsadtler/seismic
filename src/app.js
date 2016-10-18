@@ -7,6 +7,7 @@ var http = require('http');
 
 var app = express();
 var port =  process.env.PORT || 5000;
+var port_number = server.listen(process.env.PORT || 3000);
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
 // Checking to see if this function is needed when app defined as worker on Heroku
@@ -18,9 +19,9 @@ var server = http.createServer(function(request, response) {
   var filePath = false;
 
   if (request.url == '/') {
-    filePath = "public/index.html";
+    filePath = "../public/index.html";
   } else {
-    filePath = "public" + request.url;
+    filePath = "../public" + request.url;
   }
 
   var absPath = "./" + filePath;
