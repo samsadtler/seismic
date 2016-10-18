@@ -14,6 +14,19 @@ setInterval(function() {
     http.get("http://seismic-server.herokuapp.com");
 }, 300000)
 
+var server = http.createServer(function(request, response) {
+  var filePath = false;
+
+  if (request.url == '/') {
+    filePath = "public/index.html";
+  } else {
+    filePath = "public" + request.url;
+  }
+
+  var absPath = "./" + filePath;
+  serverWorking(response, absPath);
+});
+
 app.listen(port, function() {
   console.log('Server running on ' + port);
   dotenv.load();
