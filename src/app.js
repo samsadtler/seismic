@@ -6,13 +6,13 @@ var formData = require('form-data');
 var http = require('http');
 
 var app = express();
-var port =  process.env.PORT || 5000;
+var port =  process.env.PORT || 10000;
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
 // Checking to see if this function is needed when app defined as worker on Heroku
 setInterval(function() {
     http.get("http://seismic-server.herokuapp.com");
-}, 300000)
+}, 1500000)
 
 app.listen(port, function() {
   console.log('Server running on ' + port);
