@@ -2,6 +2,10 @@
   "name": "seismic-server",
   "version": "0.0.3",
   "private": true,
+  "engines": {
+    "node": "6.7.0",
+    "npm":"3.10.3"
+  },
   "dependencies": {
     "body-parser": "~1.13.2",
     "debug": "~2.2.0",

@@ -7,26 +7,12 @@ var http = require('http');
 
 var app = express();
 var port =  process.env.PORT || 5000;
-var port_number = server.listen(process.env.PORT || 3000);
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
 // Checking to see if this function is needed when app defined as worker on Heroku
 setInterval(function() {
     http.get("http://seismic-server.herokuapp.com");
 }, 300000)
-
-var server = http.createServer(function(request, response) {
-  var filePath = false;
-
-  if (request.url == '/') {
-    filePath = "../public/index.html";
-  } else {
-    filePath = "../public" + request.url;
-  }
-
-  var absPath = "./" + filePath;
-  serverWorking(response, absPath);
-});
 
 app.listen(port, function() {
   console.log('Server running on ' + port);
