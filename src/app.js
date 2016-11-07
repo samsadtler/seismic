@@ -6,7 +6,7 @@ var formData = require('form-data');
 var http = require('http');
 
 var app = express();
-var port =  process.env.PORT || 10000;
+var port =  process.env.PORT || 4000;
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
 // Checking to see if this function is needed when app defined as worker on Heroku
@@ -56,7 +56,9 @@ function loadDistanceToQuake(mostRecentQuake) {
     return res.json();
   })
   .then(function(data) {
-    mostRecentQuake.distance = data.rows[0].elements[0].distance.value;
+    mostRecentQuake.distance = 400000;
+    //faking distance until the google maps api chills
+    // mostRecentQuake.distance = data.rows[0].elements[0].distance.value;
     return mostRecentQuake;
   })
 }
