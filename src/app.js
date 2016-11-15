@@ -1,30 +1,26 @@
 var dotenv = require('dotenv');
-var express = require('express');
-var app = express();
 var path = require('path');
 var bodyParser = require('body-parser');
-
-require('es6-promise').polyfill();
-require('isomorphic-fetch');
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); 
-// var router = express.Router();
-// app.use('/', router);
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'html');
-
+var express = require('express');
 var formData = require('form-data');
 var http = require('http');
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
+
+var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'html');
 
 var port =  process.env.PORT || 4000;
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
 var recentLocation = {};
-// Checking to see if this function is needed when app defined as worker on Heroku
+
 setInterval(function() {
     http.get("http://seismic-server.herokuapp.com");
-}, 1500000)
+}, 1500000);
 
 app.listen(port, function() {
   console.log('Server running on ' + port);
@@ -32,21 +28,19 @@ app.listen(port, function() {
   start();
 });
 
-app.get('/',function(req,res){
+app.get('/',function(req, res) {
   res.sendFile(path.join(__dirname+'/index.html'));
 
-})
+});
 
-app.post('/api/location', function(req,res){
-    res.send('POST request to the homepage')
-    console.log('location requested')
-    console.log(req.body)
-
-
-})
+app.post('/api/location', function(req, res) {
+    res.send('POST request to the homepage');
+    console.log('location requested');
+    console.log(req.body);
+});
 
 function start() {
-  console.log('start monitoring')
+  console.log('start monitoring');
   checkForQuakes();
 }
 
@@ -59,21 +53,21 @@ function checkForQuakes() {
   .then(loadDistanceToQuake)
   .then(triggerSense);
 
-  quakeTimer = setTimeout(function(){ checkForQuakes(); }, 1000);
+  quakeTimer = setTimeout(function() { checkForQuakes(); }, 1000);
 }
 
 function loadMostRecentQuake() {
-  // console.log('Load USGS Data');
 	return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
     .then(function(res) {
 			return res.json();
 		})
 		.then(function(data) {
       return data.features[0].properties;
-    })
+    });
 }
 
 function loadDistanceToQuake(mostRecentQuake) {
+  //TODO: refactor this method
   //maximum number of api request 2500/day
   quakeLocation = mostRecentQuake.place.split(' ').join('+');
 
@@ -84,17 +78,17 @@ function loadDistanceToQuake(mostRecentQuake) {
   .then(function(data) {
     mostRecentQuake.distance = 400000;
     //faking distance until the google maps api chills
-    // mostRecentQuake.distance = data.rows[0].elements[0].distance.value;
+    //mostRecentQuake.distance = data.rows[0].elements[0].distance.value;
     return mostRecentQuake;
-  })
+  });
 }
 
-function triggerSense(mostRecentQuake){
+function triggerSense(mostRecentQuake) {
   if(mostRecentQuake.time > lastRecordedQuakeTime && mostRecentQuake.mag > 1) {
     lastRecordedQuakeTime = mostRecentQuake.time;
     var scaledMagnitude = scaleMagnitude(mostRecentQuake.mag);
     var scaledDistanceToQuake = scaleDistance(mostRecentQuake.distance);
-    console.log("MAGNITUDE: " + mostRecentQuake.mag)
+    console.log("MAGNITUDE: " + mostRecentQuake.mag);
     console.log(" DISTANCE: " + mostRecentQuake.distance/1000);
     console.log("SCALED MAGNITUDE: " + scaledMagnitude);
     console.log("SCALED DISTANCE: " + scaledDistanceToQuake);
@@ -103,7 +97,7 @@ function triggerSense(mostRecentQuake){
 }
 
 function vibrateSense(magnitude, distance) {
-  console.log('sending data')
+  console.log('sending data');
   var concatValues = magnitude+'n'+distance;
   console.log('concatValues: ', concatValues);
   var form = new formData();
@@ -124,7 +118,6 @@ function scaleDistance(distance) {
   var newMax = 135;
   var newMin = 0;
   var scaledDistance = (distance - distanceMin) * (newMax - newMin) / (distanceMax - distanceMin) + newMin;  
-  // var scaledDistance = (newMax/distanceMax) * (distance - distanceMax) + newMax;
   return Math.abs(Math.round(scaledDistance));
 }
 
@@ -133,7 +126,6 @@ function scaleMagnitude(magnitude) {
   var richterMin = 1;
   var newMax = 4000;
   var newMin = 200;
-
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
 }
