@@ -2,11 +2,15 @@ var dotenv = require('dotenv');
 var express = require('express');
 var app = express();
 var path = require('path');
-
-var router = express.Router();
+var bodyParser = require('body-parser');
 
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); 
+// var router = express.Router();
+// app.use('/', router);
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'html');
 
@@ -29,17 +33,16 @@ app.listen(port, function() {
 });
 
 app.get('/',function(req,res){
-  console.log('hellllllllo')
-  //res.send('Hello World!')
   res.sendFile(path.join(__dirname+'/index.html'));
 
 })
 
-router.post('/api/location', function(req,res){
+app.post('/api/location', function(req,res){
+    res.send('POST request to the homepage')
     console.log('location requested')
-    console.log(req)
-    recentLocation = data;
-    console.log(recentLocation)
+    console.log(req.body)
+
+
 })
 
 function start() {
