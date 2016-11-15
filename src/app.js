@@ -28,7 +28,7 @@ app.listen(port, function() {
   start();
 });
 
-router.get('/',function(req,res){
+app.get('/',function(req,res){
   console.log('hellllllllo')
   res.send('Hello World!')
   res.render('index.html');
