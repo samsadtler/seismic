@@ -1,14 +1,22 @@
 var dotenv = require('dotenv');
 var express = require('express');
+var app = express();
+var path = require('path');
+
+var router = express.Router();
+
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'html');
+
 var formData = require('form-data');
 var http = require('http');
 
-var app = express();
 var port =  process.env.PORT || 4000;
 var quakeTimer;
 var lastRecordedQuakeTime = 0;
+var recentLocation = {};
 // Checking to see if this function is needed when app defined as worker on Heroku
 setInterval(function() {
     http.get("http://seismic-server.herokuapp.com");
@@ -19,6 +27,20 @@ app.listen(port, function() {
   dotenv.load();
   start();
 });
+
+router.get('/',function(req,res){
+  console.log('hellllllllo')
+  res.send('Hello World!')
+  res.render('index.html');
+
+})
+
+router.post('/api/location', function(req,res){
+    console.log('location requested')
+    console.log(req)
+    recentLocation = data;
+    console.log(recentLocation)
+})
 
 function start() {
   console.log('start monitoring')
@@ -49,6 +71,7 @@ function loadMostRecentQuake() {
 }
 
 function loadDistanceToQuake(mostRecentQuake) {
+  //maximum number of api request 2500/day
   quakeLocation = mostRecentQuake.place.split(' ').join('+');
 
   return fetch('https://maps.googleapis.com/maps/api/distancematrix/json?origins='+quakeLocation+'&destinations=New+York,New+York&key='+process.env.GOOGLE_MAPS_API_KEY)
