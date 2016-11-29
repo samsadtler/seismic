@@ -25,7 +25,7 @@ setInterval(function() {
 app.listen(port, function() {
   console.log('Server running on port ' + port);
   dotenv.load();
-  start();
+  checkForQuakes();
 });
 
 app.get('/',function(req, res) {
@@ -37,14 +37,6 @@ app.post('/api/location', function(req, res) {
   console.log('location requested');
   console.log(req.body);
 });
-
-function start() {
-  checkForQuakes();
-}
-
-function stop() {
-  clearTimeout(quakeTimer);
-}
 
 function checkForQuakes() {
   fetchNewQuakeData()
