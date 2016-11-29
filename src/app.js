@@ -61,11 +61,13 @@ function shouldTriggerSense(quakeData) {
 
 function fetchNewQuakeData() {
   return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
-    .then(function(res) {
-      return res.json();
+    .then(function(response) {
+      return response.json();
+    }, function(error) {
+      logError(error);
     })
-    .then(function(data) {
-      return data.features[0].properties;
+    .then(function(json) {
+      return json.features[0].properties;
     });
 }
 
@@ -130,6 +132,11 @@ function scaleMagnitude(magnitude) {
 
 function log(message) {
   console.log(message);
+}
+
+function logError(error) {
+  console.log("Encountered an error:");
+  console.log(error);
 }
 
 function logShouldVibrate(quakeData, scaledMagnitude, scaledDistance) {
