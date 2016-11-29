@@ -41,8 +41,13 @@ app.post('/api/location', function(req, res) {
 function checkForQuakes() {
   fetchNewQuakeData().then(function(quakeData) {
     if(shouldTriggerSense(quakeData)){
-      loadDistanceTo(quakeData)
-        .then(triggerSense);
+      loadDistance(quakeData).then(function(quakeData) {
+        if(quakeData == null) {
+          log('Error discovered. Cancel triggering sense.')
+        } else {
+          triggerSense(quakeData)
+        }
+      });
     }
   });
   quakeTimer = setTimeout(function() { checkForQuakes(); }, 1000);
@@ -67,14 +72,14 @@ function fetchNewQuakeData() {
   });
 }
 
-function loadDistanceTo(quakeData) {
+function loadDistance(quakeData) {
   log('Loading distance from Google API...');
   quakeLocation = quakeData.place.split(' ').join('+');
   var url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins='+quakeLocation+'&destinations=New+York,New+York&key='+process.env.GOOGLE_MAPS_API_KEY;
   return fetchJson(url, function(json) {
     if(responseHasErrors(json)){
       logError(json.error_message);
-      return false;
+      return null;
     }
     quakeData.distance = data.rows[0].elements[0].distance.value;
     log('Distance found: ' + quakeData.distance);
