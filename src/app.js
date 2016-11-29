@@ -23,7 +23,7 @@ setInterval(function() {
 }, 1500000);
 
 app.listen(port, function() {
-  console.log('Server running on port ' + port);
+  log('Server running on port ' + port);
   dotenv.load();
   checkForQuakes();
 });
@@ -34,8 +34,8 @@ app.get('/',function(req, res) {
 
 app.post('/api/location', function(req, res) {
   res.send('POST request to the homepage');
-  console.log('location requested');
-  console.log(req.body);
+  log('location requested');
+  log(req.body);
 });
 
 function checkForQuakes() {
@@ -92,7 +92,7 @@ function triggerSense(quakeData) {
   logShouldVibrate(quakeData, magnitude, distance);
 
   var concatValues = magnitude + 'n' + distance;
-  console.log('Sending vibration command with values: ' + concatValues);
+  log('Sending vibration command with values: ' + concatValues);
   sendToParticle(concatValues);
 }
 
@@ -105,8 +105,8 @@ function sendToPartcile(concatValues) {
       return res.json();
     })
     .then(function(json) {
-      console.log('Response received: ');
-      console.log(json);
+      log('Response received: ');
+      log(json);
     });
 }
 
@@ -128,7 +128,11 @@ function scaleMagnitude(magnitude) {
   return Math.abs(Math.round(scaledMagnitude));
 }
 
-function logShouldVibrate(quakeData, scaledMagnitude, scaledDistance){
+function log(message) {
+  console.log(message);
+}
+
+function logShouldVibrate(quakeData, scaledMagnitude, scaledDistance) {
   console.log("Vibration triggered with values:");
   console.log(" -> magnitude:        " + quakeData.mag);
   console.log(" -> distance:         " + quakeData.distance);
