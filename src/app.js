@@ -39,10 +39,24 @@ app.post('/api/location', function(req, res) {
 });
 
 function checkForQuakes() {
-  fetchNewQuakeData()
-    .then(loadDistance)
-    .then(respondToQuakeData);
+  fetchNewQuakeData().then(function(quakeData) {
+    if(shouldTriggerSense(quakeData)){
+      loadDistanceTo(quakeData)
+        .then(triggerSense);
+    }
+  });
   quakeTimer = setTimeout(function() { checkForQuakes(); }, 1000);
+}
+
+function shouldTriggerSense(quakeData) {
+  var isNewQuake = quakeData.time > lastRecordedQuakeTime;
+  var isHighMagnitude = quakeData.mag > 1;
+  var shouldTrigger = isNewQuake && isHighMagnitude;
+
+  if(shouldTrigger) {
+    lastRecordedQuakeTime = quakeData.time;
+  }
+  return shouldTrigger;
 }
 
 function fetchNewQuakeData() {
@@ -55,7 +69,7 @@ function fetchNewQuakeData() {
     });
 }
 
-function loadDistance(quakeData) {
+function loadDistanceTo(quakeData) {
   //TODO: refactor this method
   //maximum number of api request 2500/day
   quakeLocation = quakeData.place.split(' ').join('+');
@@ -72,23 +86,17 @@ function loadDistance(quakeData) {
   });
 }
 
-function respondToQuakeData(quakeData) {
-  var isNewQuake = quakeData.time > lastRecordedQuakeTime;
-  var isHighMagnitude = quakeData.mag > 1;
-  var shouldVibrate = isNewQuake && isHighMagnitude;
+function triggerSense(quakeData) {
+  var magnitude = scaleMagnitude(quakeData.mag);
+  var distance = scaleDistance(quakeData.distance);
+  logShouldVibrate(quakeData, magnitude, distance);
 
-  if(shouldVibrate) {
-    lastRecordedQuakeTime = quakeData.time;
-    var scaledMagnitude = scaleMagnitude(quakeData.mag);
-    var scaledDistance = scaleDistance(quakeData.distance);
-    logShouldVibrate(quakeData, scaledMagnitude, scaledDistance);
-    vibrateSense(scaledMagnitude, scaledDistance);
-  }
-}
-
-function vibrateSense(magnitude, distance) {
   var concatValues = magnitude + 'n' + distance;
   console.log('Sending vibration command with values: ' + concatValues);
+  sendToParticle(concatValues);
+}
+
+function sendToPartcile(concatValues) {
   var form = new formData();
   form.append('args', concatValues);
 
