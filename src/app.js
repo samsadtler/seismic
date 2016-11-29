@@ -54,38 +54,36 @@ function shouldTriggerSense(quakeData) {
   var shouldTrigger = isNewQuake && isHighMagnitude;
 
   if(shouldTrigger) {
+    log('Encountered USGS seismic event which should trigger sense');
     lastRecordedQuakeTime = quakeData.time;
   }
   return shouldTrigger;
 }
 
 function fetchNewQuakeData() {
-  return fetch('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson')
-    .then(function(response) {
-      return response.json();
-    }, function(error) {
-      logError(error);
-    })
-    .then(function(json) {
-      return json.features[0].properties;
-    });
+  var url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson';
+  return fetchJson(url, function(json) {
+    return json.features[0].properties;
+  });
 }
 
 function loadDistanceTo(quakeData) {
-  //TODO: refactor this method
-  //maximum number of api request 2500/day
+  log('Loading distance from Google API...');
   quakeLocation = quakeData.place.split(' ').join('+');
-
-  return fetch('https://maps.googleapis.com/maps/api/distancematrix/json?origins='+quakeLocation+'&destinations=New+York,New+York&key='+process.env.GOOGLE_MAPS_API_KEY)
-  .then(function(res) {
-    return res.json();
-  })
-  .then(function(data) {
-    quakeData.distance = 400000;
-    //faking distance until the google maps api chills
-    //mostRecentQuake.distance = data.rows[0].elements[0].distance.value;
+  var url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins='+quakeLocation+'&destinations=New+York,New+York&key='+process.env.GOOGLE_MAPS_API_KEY;
+  return fetchJson(url, function(json) {
+    if(responseHasErrors(json)){
+      logError(json.error_message);
+      return false;
+    }
+    quakeData.distance = data.rows[0].elements[0].distance.value;
+    log('Distance found: ' + quakeData.distance);
     return quakeData;
   });
+}
+
+function responseHasErrors(json) {
+  return json.error_message != '';
 }
 
 function triggerSense(quakeData) {
@@ -128,6 +126,18 @@ function scaleMagnitude(magnitude) {
   var newMin = 200;
   var scaledMagnitude = ((newMax - newMin)/(richterMax - richterMin)) * (magnitude - richterMax) + newMax;
   return Math.abs(Math.round(scaledMagnitude));
+}
+
+function fetchJson(url, handler) {
+  return fetch(url)
+    .then(function(response) {
+      return response.json();
+    }, function(error) {
+      logError(error);
+    })
+    .then(handler, function(error) {
+      logError(error);
+    });
 }
 
 function log(message) {
