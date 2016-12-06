@@ -33,23 +33,23 @@ app.get('/',function(req, res) {
   res.sendFile(path.join(__dirname+'/index.html'));
 });
 
-app.post('/api/location', function(req, res) {
+/*app.post('/api/location', function(req, res) {
   res.send('POST request to the homepage');
   log('New cell tower info received from seismic sense:');
   log(req.body);
   loadCellTowerLocation(req.body);
-});
+});*/
 
 function checkForQuakes() {
   fetchNewQuakeData().then(function(quakeData) {
     if(shouldTriggerSense(quakeData)){
-      loadDistance(quakeData).then(function(quakeData) {
+      /*loadDistance(quakeData).then(function(quakeData) {
         if(quakeData == null) {
           log('Error discovered. Cancel triggering sense.')
         } else {
           triggerSense(quakeData)
         }
-      });
+      });*/
     }
   });
   quakeTimer = setTimeout(function() { checkForQuakes(); }, 1000);
