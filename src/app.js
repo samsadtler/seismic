@@ -102,7 +102,7 @@ function loadCellTowerLocation(cellTowerData) {
     
  }).then(function(res) {
       log('Geolocation Response: ');
-      log(res);
+      log(JSON.stringify(res));
     });
   
 }
