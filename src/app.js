@@ -97,12 +97,13 @@ function loadCellTowerLocation(cellTowerData) {
   var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
   fetch(url, {
     method: 'POST' , 
-    headers: { "Content-type": "application/x-www-form-urlencoded; charset=UTF-8" },
+    headers: headers,
     body: cellTowerData, 
     
  }).then(function(res) {
       log('Geolocation Response: ');
-      log(JSON.stringify(res));
+      log(res.headers.get('Content-Type'))
+      // log(JSON.stringify(res));
     });
   
 }
