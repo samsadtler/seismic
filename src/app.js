@@ -43,13 +43,13 @@ app.post('/api/location', function(req, res) {
 function checkForQuakes() {
   fetchNewQuakeData().then(function(quakeData) {
     if(shouldTriggerSense(quakeData)){
-      /*loadDistance(quakeData).then(function(quakeData) {
+      loadDistance(quakeData).then(function(quakeData) {
         if(quakeData == null) {
           log('Error discovered. Cancel triggering sense.')
         } else {
           triggerSense(quakeData)
         }
-      });*/
+      });
     }
   });
   quakeTimer = setTimeout(function() { checkForQuakes(); }, 1000);
