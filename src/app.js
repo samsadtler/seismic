@@ -81,14 +81,14 @@ function loadDistance(quakeData) {
       logError(json.error_message);
       return null;
     }
-    quakeData.distance = data.rows[0].elements[0].distance.value;
+    quakeData.distance = json.rows[0].elements[0].distance.value;
     log('Distance found: ' + quakeData.distance);
     return quakeData;
   });
 }
 
 function responseHasErrors(json) {
-  return json.error_message != '';
+  return json.status != 'OK';
 }
 
 function triggerSense(quakeData) {
@@ -101,7 +101,7 @@ function triggerSense(quakeData) {
   sendToParticle(concatValues);
 }
 
-function sendToPartcile(concatValues) {
+function sendToParticle(concatValues) {
   var form = new formData();
   form.append('args', concatValues);
 
