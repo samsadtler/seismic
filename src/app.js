@@ -19,6 +19,7 @@ var lastRecordedQuakeTime = 0;
 var recentLocation = {};
 
 setInterval(function() {
+  log('Sending keep-alive GET request to heroku')
   http.get("http://seismic-server.herokuapp.com");
 }, 1500000);
 
@@ -34,8 +35,9 @@ app.get('/',function(req, res) {
 
 app.post('/api/location', function(req, res) {
   res.send('POST request to the homepage');
-  log('location requested');
+  log('New cell tower info received from seismic sense:');
   log(req.body);
+  loadCellTowerLocation(req.body);
 });
 
 function checkForQuakes() {
@@ -73,7 +75,7 @@ function fetchNewQuakeData() {
 }
 
 function loadDistance(quakeData) {
-  log('Loading distance from Google API...');
+  log('Loading distance from Google Maps API...');
   quakeLocation = quakeData.place.split(' ').join('+');
   var url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins='+quakeLocation+'&destinations=New+York,New+York&key='+process.env.GOOGLE_MAPS_API_KEY;
   return fetchJson(url, function(json) {
@@ -87,6 +89,17 @@ function loadDistance(quakeData) {
   });
 }
 
+function loadCellTowerLocation(cellTowerData) {
+  log('Loading distance from Google Geolocation API...');
+  var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
+  fetch(url,{method: 'POST' , body: cellTowerData});
+    .then(function(res) {
+      log('Geolocation Response: ');
+      log(res);
+    }
+  
+}
+
 function responseHasErrors(json) {
   return json.status != 'OK';
 }
@@ -97,7 +110,7 @@ function triggerSense(quakeData) {
   logShouldVibrate(quakeData, magnitude, distance);
 
   var concatValues = magnitude + 'n' + distance;
-  log('Sending vibration command with values: ' + concatValues);
+  log('Sending vibration command to seismic sense with values: ' + concatValues);
   sendToParticle(concatValues);
 }
 
@@ -110,7 +123,7 @@ function sendToParticle(concatValues) {
       return res.json();
     })
     .then(function(json) {
-      log('Response received: ');
+      log('Response received from seismic sense: ');
       log(json);
     });
 }
