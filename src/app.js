@@ -33,12 +33,12 @@ app.get('/',function(req, res) {
   res.sendFile(path.join(__dirname+'/index.html'));
 });
 
-/*app.post('/api/location', function(req, res) {
+app.post('/api/location', function(req, res) {
   res.send('POST request to the homepage');
   log('New cell tower info received from seismic sense:');
   log(req.body);
   loadCellTowerLocation(req.body);
-});*/
+});
 
 function checkForQuakes() {
   fetchNewQuakeData().then(function(quakeData) {
