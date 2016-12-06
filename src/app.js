@@ -94,8 +94,11 @@ function loadCellTowerLocation(cellTowerData) {
   var headers = new Headers();
   headers.append('content-type', 'application/json');
   var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
-  fetch(url, {method: 'POST' , body: cellTowerData, headers: headers})
-    .then(function(res) {
+  fetch(url, {
+    method: 'POST' , 
+    body: cellTowerData, 
+    headers: new Headers({'Content-Type': 'application/json'})
+  }).then(function(res) {
       log('Geolocation Response: ');
       log(res);
     });
