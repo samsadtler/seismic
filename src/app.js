@@ -92,11 +92,11 @@ function loadDistance(quakeData) {
 function loadCellTowerLocation(cellTowerData) {
   log('Loading distance from Google Geolocation API...');
   var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
-  /*fetch(url,{method: 'POST' , body: cellTowerData})
+  fetch(url,{method: 'POST' , body: cellTowerData})
     .then(function(res) {
       log('Geolocation Response: ');
       log(res);
-    });*/
+    });
   
 }
 
