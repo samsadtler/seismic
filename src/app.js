@@ -98,9 +98,8 @@ function loadCellTowerLocation(cellTowerData) {
   fetch(url, {
     'method': 'POST' , 
     'headers': headers,
-    'body': cellTowerData, 
-    
- }).then(function(res) {
+    'body': cellTowerData 
+  }).then(function(res) {
       log('Geolocation Response: ');
       log(res);
       log('   --> Header Content-Type: '+res.headers.get('Content-Type'))
