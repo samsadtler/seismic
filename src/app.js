@@ -90,7 +90,7 @@ function loadDistance(quakeData) {
 }
 
 function loadCellTowerLocation(cellTowerData) {
-  log('cellTowerData: '+ cellTowerData)
+  log('cellTowerData: ' + JSON.stringify(cellTowerData))
   log('Loading distance from Google Geolocation API...');
 
   var headers = new Headers();
