@@ -113,39 +113,6 @@ function loadCellTowerLocation(cellTowerData) {
       log("body: " + body);
     }
   });
-
-
-
-
-  //other stuff
-
-//   var headers = new Headers();
-//   headers.append('Content-type','application/json');
-//   var body = JSON.stringify(cellTowerData);
-//   var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
-
-// var options = {
-//     method: 'POST' , 
-//     // headers: headers,
-//     body: body,    
-//     };
-
-//   fetch(url, options).then(function(res) {
- 
-//       // log('Geolocation Response Body: '+ JSON.stringify(res.body));
-//       log('Geolocation Status: '+ res.status);
-//        log('Location: '+ res.location);
-//       log('   --> Header Content-Type: '+JSON.stringify(res.headers));
-      
-//     });
-
-//   var x = fetch(url, options);
-//   x.then();
-//   x.this();
-//   x.that();
-//   x.then(function() {
-//     //stuff
-//   });
   
 }
 
