@@ -3,6 +3,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var express = require('express');
 var formData = require('form-data');
+var request = require('request');
 var http = require('http');
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
@@ -36,7 +37,7 @@ app.get('/',function(req, res) {
 app.post('/api/location', function(req, res) {
   res.send('POST request to the homepage');
   log('New cell tower info received from seismic sense:');
-  log(req.body);
+  //  log(req);
   loadCellTowerLocation(req.body);
 });
 
@@ -90,23 +91,61 @@ function loadDistance(quakeData) {
 }
 
 function loadCellTowerLocation(cellTowerData) {
-  log('cellTowerData: ' + JSON.stringify(cellTowerData))
+  // log('cellTowerData: ' + JSON.stringify(cellTowerData));
+  log('Received request with new cell tower: ' + JSON.stringify(cellTowerData));
   log('Loading distance from Google Geolocation API...');
 
-  var headers = new Headers();
-  headers.append('Content-type','application/json');
+  var options = { method: 'POST',
+      url: 'https://www.googleapis.com/geolocation/v1/geolocate',
+      qs: { key: process.env.GOOGLE_GEOLOCATION_API_KEY },
+      body: JSON.stringify(cellTowerData),
+      headers: 
+          { 'cache-control': 'no-cache',
+           'content-type': 'application/json' 
+          } 
+      };
 
-  var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
-  fetch(url, {
-    method: 'POST' , 
-    headers: headers,
-    body: JSON.stringify(cellTowerData),    
- }).then(function(res) {
-      log('Geolocation Response: ');
-      log(res);
-      log('   --> Header Content-Type: '+res.headers.get('Content-Type'))
+  request(options, function (error, response, body) {
+    if(error) {
+      log("Error: " + error);
+    } else {
+      log("response: " + response);
+      log("body: " + body);
+    }
+  });
+
+
+
+
+  //other stuff
+
+//   var headers = new Headers();
+//   headers.append('Content-type','application/json');
+//   var body = JSON.stringify(cellTowerData);
+//   var url = 'https://www.googleapis.com/geolocation/v1/geolocate?key='+process.env.GOOGLE_GEOLOCATION_API_KEY;
+
+// var options = {
+//     method: 'POST' , 
+//     // headers: headers,
+//     body: body,    
+//     };
+
+//   fetch(url, options).then(function(res) {
+ 
+//       // log('Geolocation Response Body: '+ JSON.stringify(res.body));
+//       log('Geolocation Status: '+ res.status);
+//        log('Location: '+ res.location);
+//       log('   --> Header Content-Type: '+JSON.stringify(res.headers));
       
-    });
+//     });
+
+//   var x = fetch(url, options);
+//   x.then();
+//   x.this();
+//   x.that();
+//   x.then(function() {
+//     //stuff
+//   });
   
 }
 

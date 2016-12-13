@@ -4,7 +4,7 @@
   "private": true,
   "engines": {
     "node": "6.7.0",
-    "npm":"3.10.3"
+    "npm": "3.10.3"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
@@ -19,6 +19,7 @@
     "jasmine-node": "^1.14.5",
     "node-fetch": "^1.6.0",
     "promise": "^7.1.1",
+    "request": "^2.79.0",
     "require": "^2.4.20",
     "requirejs": "^2.2.0",
     "socket.io": "^1.4.8"
