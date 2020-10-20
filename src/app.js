@@ -34,26 +34,19 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
-app.post('/api/location', function (req, res) {
-    res.send('POST request to the homepage');
-    log('New cell tower info received from seismic sense:');
-    log(req);
-    loadCellTowerLocation(req.body);
-});
 
 function checkForQuakes() {
     fetchNewQuakeData().then(function (quakeData) {
-        if (shouldTriggerSense(quakeData)) {
-            loadDistance(quakeData).then(function (quakeData) {
+        if (quakeData && quakeData.time && shouldTriggerSense(quakeData)) {
                 if (quakeData == null) {
                     log('Error discovered. Cancel triggering sense.')
                 } else {
                     triggerSense(quakeData)
                 }
-            });
         }
-    });
-    quakeTimer = setTimeout(function () { checkForQuakes(); }, 1000);
+    }).catch(e => console.log('fetchNewQuakeData Error ', e));
+
+    quakeTimer = setTimeout(() => { checkForQuakes() }, 60000);
 }
 
 function shouldTriggerSense(quakeData) {
@@ -70,9 +63,9 @@ function shouldTriggerSense(quakeData) {
 
 function fetchNewQuakeData() {
     var url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson';
-    return fetchJson(url, function (json) {
-        return json.features[0].properties;
-    });
+    return fetchJson(url, json => {
+        if (json.features) return json.features[0].properties;
+    }).catch(e => { console.error(`${e}`) });
 }
 
 function loadDistance(quakeData) {
@@ -81,41 +74,13 @@ function loadDistance(quakeData) {
     var url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + quakeLocation + '&destinations=New+York,New+York&key=' + process.env.GOOGLE_MAPS_API_KEY;
     return fetchJson(url, function (json) {
         if (responseHasErrors(json)) {
-            logError(json.error_message);
+            logError('error in load distance ',json.error_message);
             return null;
         }
         quakeData.distance = json.rows[0].elements[0].distance.value;
         log('Distance found: ' + quakeData.distance);
         return quakeData;
-    });
-}
-
-function loadCellTowerLocation(cellTowerData) {
-    // log('cellTowerData: ' + JSON.stringify(cellTowerData));
-    log('Received request with new cell tower: ' + JSON.stringify(cellTowerData));
-    log('Loading distance from Google Geolocation API...');
-
-    var options = {
-        method: 'POST',
-        url: 'https://www.googleapis.com/geolocation/v1/geolocate',
-        qs: { key: process.env.GOOGLE_GEOLOCATION_API_KEY },
-        body: JSON.stringify(cellTowerData),
-        headers:
-        {
-            'cache-control': 'no-cache',
-            'content-type': 'application/json'
-        }
-    };
-
-    request(options, function (error, response, body) {
-        if (error) {
-            log("Error: " + error);
-        } else {
-            log("response: " + response);
-            log("body: " + body);
-        }
-    });
-
+    }).catch(e => { console.log(`load distance error : ${e}`) });
 }
 
 function responseHasErrors(json) {
@@ -123,10 +88,10 @@ function responseHasErrors(json) {
 }
 
 function triggerSense(quakeData) {
-    var magnitude = scaleMagnitude(quakeData.mag);
-    var distance = scaleDistance(quakeData.distance);
-    var concatValues = magnitude + 'n' + distance;
-    logShouldVibrate(quakeData, magnitude, distance);
+    let magnitude = scaleMagnitude(quakeData.mag),
+        placeholder = 100
+        concatValues = magnitude + 'n' + placeholder;
+    logShouldInflate(quakeData, magnitude);
 
     sendToParticle(concatValues);
 }
@@ -154,15 +119,6 @@ function sendToParticle(concatValues) {
         .catch(error => logError('error' + error));
 }
 
-function scaleDistance(distance) {
-    var distanceMax = 20038000;
-    var distanceMin = 0;
-    var newMax = 135;
-    var newMin = 0;
-    var scaledDistance = (distance - distanceMin) * (newMax - newMin) / (distanceMax - distanceMin) + newMin;
-    return Math.abs(Math.round(scaledDistance));
-}
-
 function scaleMagnitude(magnitude) {
     var richterMax = 10;
     var richterMin = 1;
@@ -172,30 +128,29 @@ function scaleMagnitude(magnitude) {
     return Math.abs(Math.round(scaledMagnitude));
 }
 
-function fetchJson(url, handler) {
-    return fetch(url)
-        .then(function (response) {
+ let fetchJson = async (url, handler) => {
+    return await fetch(url)
+        .then( response => {
             return response.json();
-        }, function (error) {
+        }, error => {
             logError(error);
         })
-        .then(handler, function (error) {
+        .then(handler,  error => {
             logError(error);
-        });
+        })
 }
 
-function log(message) {
+let log = message => {
     console.log(message);
 }
 
-function logError(error) {
+let logError = error => {
     log(`Encountered an error: ${error}`);
 }
 
-function logShouldVibrate(quakeData, scaledMagnitude, scaledDistance) {
+function logShouldInflate(quakeData, scaledMagnitude) {
     console.log("Vibration triggered with values:");
     console.log(" -> magnitude:        " + quakeData.mag);
-    console.log(" -> distance:         " + quakeData.distance);
     console.log(" -> scaled magnitude: " + scaledMagnitude);
-    console.log(" -> scaled distance:  " + scaledDistance);
+
 }
